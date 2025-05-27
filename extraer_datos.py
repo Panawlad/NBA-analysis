@@ -7,13 +7,13 @@ import time
 # Archivos de entrada/salida
 input_file = "boxscores_descargados.txt"
 output_file = "team_totals_completo.csv"
-log_file = "urls_guardadas.txt"
+log_file = "urls_procesadas.txt"
 
 # Cargar URLs desde archivo
 with open(input_file, "r") as f:
     urls = [line.strip() for line in f if line.strip()]
 
-# Cargar URLs ya procesadas (guardadas)
+# Cargar URLs ya procesadas
 procesadas = set()
 if os.path.exists(log_file):
     with open(log_file, "r") as f:

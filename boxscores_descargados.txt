@@ -1486,3 +1486,7 @@ https://www.basketball-reference.com/boxscores/202505160NYK.html
 https://www.basketball-reference.com/boxscores/202505180OKC.html
 https://www.basketball-reference.com/boxscores/202505200OKC.html
 https://www.basketball-reference.com/boxscores/202505210NYK.html
+https://www.basketball-reference.com/boxscores/202505220OKC.html
+https://www.basketball-reference.com/boxscores/202505230NYK.html
+https://www.basketball-reference.com/boxscores/202505240MIN.html
+https://www.basketball-reference.com/boxscores/202505250IND.html

@@ -1,30 +1,33 @@
-import requests
-from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import os
+import requests
+from bs4 import BeautifulSoup
 import time
-
-# Configuración del rango de fechas (desde abril 2024 hasta hoy)
-inicio_temporada = datetime(2024, 4, 1)
-hoy = datetime.today()
 
 # Ruta del archivo que guarda las URLs ya extraídas
 registro_path = "boxscores_descargados.txt"
 
-# Cargar URLs previas si existen
+# Leer fechas anteriores desde las URLs guardadas
 if os.path.exists(registro_path):
     with open(registro_path, "r") as f:
-        urls_guardadas = set(line.strip() for line in f)
+        urls_guardadas = set(line.strip() for line in f if line.strip())
+
+    # Obtener la última fecha registrada en el archivo
+    fechas_guardadas = [line.split("/")[-1].split(".")[0][:8] for line in urls_guardadas]
+    fechas_guardadas.sort()
+    ultima_fecha = datetime.strptime(fechas_guardadas[-1], "%Y%m%d")
+    inicio_busqueda = ultima_fecha + timedelta(days=1)  # Continuar desde el día siguiente
 else:
     urls_guardadas = set()
+    inicio_busqueda = datetime(2024, 4, 1)  # Primera fecha por defecto si no existe el archivo
 
-# Headers para simular navegador
+hoy = datetime.today()
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/113.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0"
 }
 
-# Comenzar el scraping
-fecha = inicio_temporada
+# Comenzar el scraping desde la última fecha
+fecha = inicio_busqueda
 urls_nuevas = []
 
 while fecha <= hoy:
@@ -32,10 +35,9 @@ while fecha <= hoy:
         url = f"https://www.basketball-reference.com/boxscores/?month={fecha.month}&day={fecha.day}&year={fecha.year}"
         response = requests.get(url, headers=headers)
 
-        # Verificar si fue bloqueado
         if response.status_code == 429:
             print("⚠️ Rate limited. Esperando 1 hora...")
-            time.sleep(3600)  # Esperar 1 hora
+            time.sleep(3600)
             continue
 
         if response.status_code != 200:
@@ -48,7 +50,7 @@ while fecha <= hoy:
 
         encontrados = 0
         for box in box_scores:
-            enlace = box.find('a', text='Box Score')
+            enlace = box.find('a', string='Box Score')  # Cambiado 'text' → 'string' (para evitar warning)
             if enlace:
                 url_completa = "https://www.basketball-reference.com" + enlace['href']
                 if url_completa not in urls_guardadas:
@@ -62,11 +64,12 @@ while fecha <= hoy:
         print(f"⚠️ Error en {fecha.strftime('%Y-%m-%d')}: {e}")
 
     fecha += timedelta(days=1)
-    time.sleep(5)  # Delay para evitar bloqueo
+    time.sleep(5)
 
-# Guardar nuevas URLs
-with open(registro_path, "a") as f:
-    for url in urls_nuevas:
-        f.write(url + "\n")
+# Guardar nuevas URLs encontradas
+if urls_nuevas:
+    with open(registro_path, "a") as f:
+        for url in urls_nuevas:
+            f.write(url + "\n")
 
 print(f"\n✅ Nuevas URLs guardadas: {len(urls_nuevas)}")

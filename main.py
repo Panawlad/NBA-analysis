@@ -8,7 +8,7 @@ def main():
 
     # Ejecutar el script que procesa las URLs descargadas
     print("📊 Procesando box scores...")
-    subprocess.run(["python", "prueba.py"])
+    subprocess.run(["python", "extraer_datos.py"])
 
 if __name__ == "__main__":
     main()
